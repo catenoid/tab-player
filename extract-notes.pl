@@ -1,12 +1,6 @@
 use warnings;
 use strict;
 
-# Each stanza is composed of 6 rows representing the guitar strings
-my $guitar_string_count = 6;
-my $strings_seen = 0;
-my @unsorted_notes = ();
-my @sorted_notes;
-
 # Read in tabs
 my $infile = 'tab.txt';
 open(my $tab_fh, '<:encoding(UTF-8)', $infile)
@@ -24,23 +18,32 @@ sub ordered_note {
   $a->[2] <=> $b->[2];
 }
 
-my $beat_count = 0;
-
 # Parse the tab
-while (my $row = <$tab_fh>) {
-  my $last_string;
-  if ($row =~ /(?<string>E|B|G|D|A)\|/i) {
-    while ($' =~ /((?<note>\d+)|-)/) {
-      if ((my $note = $+{'note'})) {
-        push @unsorted_notes, [$strings_seen, $note, $beat_count];
-      }
-      $beat_count += length($1);
-    }
-    $strings_seen++;
+# Each stanza is composed of 6 rows representing the guitar strings
+my $guitar_string_count = 6;
+my $string = 0;
+my @unsorted_notes = ();
+my @sorted_notes;
+my $beat_offset = 0;
+my $is_last_string;
 
-    $last_string = ($strings_seen == $guitar_string_count);
-    if ($last_string) {
-      $strings_seen = 0;
+while (my $row = <$tab_fh>) {
+  if ($row =~ /(?<string>E|B|G|D|A)\|/i) {
+    my $beat;
+    my $beat_mantissa = 0;
+    while ($' =~ /(\d+|-)/) {
+      $beat = $beat_offset + $beat_mantissa;
+      if ($1 ne '-') {
+        push @unsorted_notes, [$string, $1, $beat];
+      }
+      $beat_mantissa += length($1);
+    }
+    $string++;
+
+    $is_last_string = ($string == $guitar_string_count);
+    if ($is_last_string) {
+      $string = 0;
+      $beat_offset = $beat;
     }
   }
 }
