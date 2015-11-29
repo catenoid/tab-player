@@ -30,17 +30,17 @@ sub ordered_note {
   }
 }
 
+my $cumulative_beat_count = 0;
+
 # Parse the tab
 while (my $row = <$tab_fh>) {
   my $last_string;
   if ($row =~ /(?<string>E|B|G|D|A)\|/i) {
-    my $beat_count = 0;
-    my $string = $+{'string'};
     while ($' =~ /((?<note>\d+)|-)/) {
       if ((my $note = $+{'note'})) {
-        push @unsorted_notes, [$stanza,$string,$note,$beat_count];
+        push @unsorted_notes, [$stanza,$strings_seen,$note,$cumulative_beat_count];
       }
-      $beat_count += length($1);
+      $cumulative_beat_count += length($1);
     }
     $strings_seen++;
 
@@ -54,8 +54,11 @@ while (my $row = <$tab_fh>) {
 
 @sorted_notes = sort ordered_note @unsorted_notes;
 
-# Testing output
-my $i;
-for $i ( 0 .. $#sorted_notes ) {
-   print "stanza $sorted_notes[$i][0], beat $sorted_notes[$i][3]\n";
+# Store in CSV
+for my $i ( 0 .. $#sorted_notes ) {
+  print $notes_fh "$sorted_notes[$i][0]";
+  for my $j (1 .. $#{ $sorted_notes[$i] }) {
+    print $notes_fh ",$sorted_notes[$i][$j]";
+  }
+  print $notes_fh "\n";
 }
