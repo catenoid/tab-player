@@ -17,7 +17,7 @@ my @events = (
 
 while (my $row = <$notes_fh>) {
   chomp($row);
-  my ($stanza, $string, $fret, $beat) = split(',', $row);
+  my ($string, $fret, $beat) = split(',', $row);
   my $note = ($string2MIDInumber[$string] + $fret);
   push @events,
     ['note_on', 0, 1, $note, 127], 

@@ -4,7 +4,6 @@ use strict;
 # Each stanza is composed of 6 rows representing the guitar strings
 my $guitar_string_count = 6;
 my $strings_seen = 0;
-my $stanza = 0;
 my @unsorted_notes = ();
 my @sorted_notes;
 
@@ -22,15 +21,10 @@ sub ordered_note {
   # Sorting function returns -1 when $a precedes $b in the result
   # $a and $b are array references
   # Binary <=> returns -1 if left < right, 0 if equal, 1 otherwise
-  if ($a->[0] == $b->[0]) {
-    # Notes are in the same stanza
-    $a->[3] <=> $b->[3];
-  } else {
-  $a->[0] <=> $b->[0];
-  }
+  $a->[2] <=> $b->[2];
 }
 
-my $cumulative_beat_count = 0;
+my $beat_count = 0;
 
 # Parse the tab
 while (my $row = <$tab_fh>) {
@@ -38,15 +32,14 @@ while (my $row = <$tab_fh>) {
   if ($row =~ /(?<string>E|B|G|D|A)\|/i) {
     while ($' =~ /((?<note>\d+)|-)/) {
       if ((my $note = $+{'note'})) {
-        push @unsorted_notes, [$stanza,$strings_seen,$note,$cumulative_beat_count];
+        push @unsorted_notes, [$strings_seen, $note, $beat_count];
       }
-      $cumulative_beat_count += length($1);
+      $beat_count += length($1);
     }
     $strings_seen++;
 
     $last_string = ($strings_seen == $guitar_string_count);
     if ($last_string) {
-      $stanza++;
       $strings_seen = 0;
     }
   }
