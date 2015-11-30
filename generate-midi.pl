@@ -12,10 +12,12 @@ open(my $notes_fh, '<:encoding(UTF-8)', $infile)
 
 my @events = (
   ['text_event', 0, 'Your hand in mine'],
-  ['set_tempo', 0, 450_000]
+  ['text_event', 0, 'by Explosions in the Sky'],
+  ['set_tempo', 0, 450_000],
+  ['patch_change', 0, 1, 28] # electric guitar
 );
 
-my $previous_beat = -1; # we don't want the first is_chord to test true
+my $previous_beat = -1;
 my @chord = (); # For collecting notes that are played simultaneously
 
 while (my $row = <$notes_fh>) {
