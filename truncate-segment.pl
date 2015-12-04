@@ -65,7 +65,7 @@ my $first_string_note_number = $note2number{$first_string_note};
 my $last_string_note_number = $note2number{$last_string_note};
 
 # E string aliasing; Exception 1
-if (($first_string_note_number != $last_string_note_number) and ($last_string_note == 'e')) {
+if (($first_string_note_number != $last_string_note_number) and ($last_string_note eq 'e')) {
   $last_string_note_number = 5;
 }
 
@@ -75,7 +75,7 @@ if ($incomplete_row_above) {
   $first_string_index--;
 
   # E string aliasing; Exception 2
-  if ($last_string_note == 'e') {
+  if ($last_string_note eq 'e') {
     $last_string_note_number = 5;
   }
 }
@@ -126,7 +126,6 @@ while ($last_string_note_number < 5) {
   $last_string_note_number++;
 }
 
-say "\n\nTruncated strings:";
 for my $string (@strings) {
-  say $string;
+  print $tr_tab_fh "$string\n";
 }
