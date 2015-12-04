@@ -47,17 +47,10 @@ FILTER: {
 }
 
 
-# eg. start-missing \n complete \n complete \n end-missing
-# substring of completes as bound by the length of start-missing and end-missing
-# Add blank strings (i.e. ----------------) as needed
 # Either:
 #  - Remove reference to string name, and modify extract-notes.pl to treat the first line of input as high e, OR
 #  - Prepend each line with the string name
 
-# Todo: Get the offset into the six string frame so we know where to add blank tabs
-
-# Set note name to lowercase first
-# The first note is only ever going to be top E UNLESS both $first_string_index and $last_string_index are both E
 my %note2number = (
   "e" => 0, 
   "b" => 1,
@@ -66,19 +59,23 @@ my %note2number = (
   "a" => 4,
 );
 
-my $first_string_note_number = $note2number{lc $first_string_note};
-my $last_string_note_number = $note2number{lc $last_string_note};
+$first_string_note = lc $first_string_note;
+$last_string_note = lc $last_string_note;
+my $first_string_note_number = $note2number{$first_string_note};
+my $last_string_note_number = $note2number{$last_string_note};
 
-if ($first_string_note_number == $last_string_note_number and $first_string_note_number == '0') {
-  $first_string_note_number = 5;
-  $last_string_note_number = 5; 
+# E string aliasing; Exception 1
+if (($first_string_note_number != $last_string_note_number) and ($last_string_note == 'e')) {
+  $last_string_note_number = 5;
 }
 
 my $incomplete_row_above = ($first_string_index != 0 and ($selection[$first_string_index-1] =~ /^(-|\d)+/)); 
 if ($incomplete_row_above) {
   print "Incomplete row above to add to the truncated tab\n";
   $first_string_index--;
-  if ((lc $last_string_note) == 'e') {
+
+  # E string aliasing; Exception 2
+  if ($last_string_note == 'e') {
     $last_string_note_number = 5;
   }
 }
@@ -106,7 +103,6 @@ my $truncated_length = $last_partial - $offset;
 # Check begin cursor comes before end cursor; that $truncated_length is positive
 print "Truncated length: $truncated_length";
 
-# supports 3+ strings
 sub say {print @_, "\n"}
 
 say "\nUntruncated strings:";
@@ -114,9 +110,23 @@ for my $string (@strings) {
   say $string;
 }
 
-say "\n\nTruncated strings:";
-say (substr $strings[0], 0, $truncated_length);
+$strings[0] = (substr $strings[0], 0, $truncated_length);
 for my $i (1 .. ($#strings-1)) {
-  say (substr $strings[$i], $offset, $truncated_length);
+  $strings[$i] = (substr $strings[$i], $offset, $truncated_length);
 }
-say (substr $strings[$#strings], -$truncated_length);
+$strings[$#strings] = (substr $strings[$#strings], -$truncated_length);
+
+my $blank_string = '-' x $truncated_length;
+while ($first_string_note_number > 1) {
+  unshift @strings, $blank_string;
+  $first_string_note_number--;
+}
+while ($last_string_note_number < 5) {
+  push @strings, $blank_string;
+  $last_string_note_number++;
+}
+
+say "\n\nTruncated strings:";
+for my $string (@strings) {
+  say $string;
+}
