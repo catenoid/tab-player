@@ -25,25 +25,27 @@ while (my $row = <$tab_fh>) {
 # Pick up the indicies of the first consecutive bunch of strings
 # If 1st is not high e, take the 0th line too
 my $first_string_index;
+my $first_string_note;
 my $last_string_index;
+my $last_string_note;
 FILTER: {
   for my $i (0 .. $#selection) {
     if ($selection[$i] =~ /^(E|A|D|G|B)/i) {
       print "found first string ($1) is on line $i: $selection[$i]\n";
       $first_string_index = $i;
+      $first_string_note = $1;
       for my $j ($i .. $#selection) {
-        if ($selection[$j] !~ /^(E|A|D|G|B)/i) {
-          print "found last string ($1) is on line ".($j-1)."\n";
-          $last_string_index = $j-1;
-          last FILTER;
+        if ($selection[$j] =~ /^(E|A|D|G|B)/i) {
+          print "found last (?) string ($1) is on line $j\n";
+          $last_string_index = $j;
+          $last_string_note = $1;
         }
       }
-      print "found last string on line $#selection: $selection[$#selection]\n";
-      $last_string_index = $#selection;
       last FILTER;
     }
   }
 }
+
 
 # eg. start-missing \n complete \n complete \n end-missing
 # substring of completes as bound by the length of start-missing and end-missing
@@ -53,6 +55,16 @@ FILTER: {
 #  - Prepend each line with the string name
 
 # Todo: Get the offset into the six string frame so we know where to add blank tabs
+
+# Set note name to lowercase first
+# The first note is only ever going to be top E UNLESS both $first_string_index and $last_string_index are both E
+my %note2number = (
+  "e" => 0, 
+  "b" => 1,
+  "g" => 2,
+  "d" => 3,
+  "a" => 4,
+);
 
 my $incomplete_row_above = ($first_string_index != 0 and ($selection[$first_string_index-1] =~ /^(-|\d)+/)); 
 if ($incomplete_row_above) {
