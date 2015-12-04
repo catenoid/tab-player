@@ -52,18 +52,46 @@ FILTER: {
 #  - Remove reference to string name, and modify extract-notes.pl to treat the first line of input as high e, OR
 #  - Prepend each line with the string name
 
-# what if you highlight a portion of one string, no labels at all?
-# say we need context
+# Todo: Get the offset into the six string frame so we know where to add blank tabs
 
 my $incomplete_row_above = ($first_string_index != 0 and ($selection[$first_string_index-1] =~ /^(-|\d)+/)); 
 if ($incomplete_row_above) {
+  print "Incomplete row above to add to the truncated tab\n";
   $first_string_index--;
 }
 
+# Supports 3+ strings
+# 1 string: Correctness uncertain
+# 2 strings: Not enought context to align, unless bars (|) are processed somehow
 my @strings = @selection[$first_string_index .. $last_string_index];
 
+my $first_partial = length($strings[0]);
+print "First partial length is $first_partial\n";
+
+my $full = length($strings[1]);
+print "Full length is $full\n";
+
+my $last_partial = length($strings[$#strings]);
+print "Last partial length is $last_partial\n";
+
+my $offset = $full - $first_partial;
+print "Offset: $offset\n";
+
+my $truncated_length = $last_partial - $offset;
+# Check begin cursor comes before end cursor; that $truncated_length is positive
+print "Truncated length: $truncated_length";
+
+# supports 3+ strings
+sub say {print @_, "\n"}
+
+say "\nUntruncated strings:";
 for my $string (@strings) {
-  print "$string\n";
+  say $string;
 }
 
-# check begin < end
+say "\n\nTruncated strings:";
+say (substr $strings[0], 0, $truncated_length);
+for my $i (1 .. ($#strings-1)) {
+  say (substr $strings[$i], $offset, $truncated_length);
+}
+say (substr $strings[$#strings], -$truncated_length);
