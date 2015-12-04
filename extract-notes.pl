@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 # Read in tabs
-my $infile = 'tab.txt';
+my $infile = 'tab-after-truncating.txt';
 open(my $tab_fh, '<:encoding(UTF-8)', $infile)
   or die "Could not open file '$infile' $!";
 
@@ -28,24 +28,22 @@ sub ordered_note {
 }
 
 while (my $row = <$tab_fh>) {
-  if ($row =~ /(E|B|G|D|A)[^-]*/i) {
-    my $beat;
-    my $beat_mantissa = 0;
-    while ($' =~ /((?<fret>1[0-5]|[0-9])|-+|.)/) {
-      # Tabs can concatenate single-digit notes; Stop at fret 15
-      $beat = $beat_offset + $beat_mantissa;
-      if (defined($+{'fret'})) {
-        push @unsorted_notes, [$string, $+{'fret'}, $beat];
-      }
-      $beat_mantissa += length($1);
+  my $beat;
+  my $beat_mantissa = 0;
+  while ($row =~ /((?<fret>1[0-5]|[0-9])|-+|.)/g) {
+    # Tabs can concatenate single-digit notes; Stop at fret 15
+    $beat = $beat_offset + $beat_mantissa;
+    if (defined($+{'fret'})) {
+      push @unsorted_notes, [$string, $+{'fret'}, $beat];
     }
-    $string++;
+    $beat_mantissa += length($1);
+  }
+  $string++;
 
-    $is_last_string = ($string == $guitar_string_count);
-    if ($is_last_string) {
-      $string = 0;
-      $beat_offset = $beat;
-    }
+  $is_last_string = ($string == $guitar_string_count);
+  if ($is_last_string) {
+    $string = 0;
+    $beat_offset = $beat;
   }
 }
 

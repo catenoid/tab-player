@@ -23,7 +23,6 @@ while (my $row = <$tab_fh>) {
 }
 
 # Pick up the indicies of the first consecutive bunch of strings
-# If 1st is not high e, take the 0th line too
 my $first_string_index;
 my $first_string_note;
 my $last_string_index;
@@ -45,11 +44,6 @@ FILTER: {
     }
   }
 }
-
-
-# Either:
-#  - Remove reference to string name, and modify extract-notes.pl to treat the first line of input as high e, OR
-#  - Prepend each line with the string name
 
 my %note2number = (
   "e" => 0, 
