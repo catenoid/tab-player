@@ -66,11 +66,24 @@ my %note2number = (
   "a" => 4,
 );
 
+my $first_string_note_number = $note2number{lc $first_string_note};
+my $last_string_note_number = $note2number{lc $last_string_note};
+
+if ($first_string_note_number == $last_string_note_number and $first_string_note_number == '0') {
+  $first_string_note_number = 5;
+  $last_string_note_number = 5; 
+}
+
 my $incomplete_row_above = ($first_string_index != 0 and ($selection[$first_string_index-1] =~ /^(-|\d)+/)); 
 if ($incomplete_row_above) {
   print "Incomplete row above to add to the truncated tab\n";
   $first_string_index--;
+  if ((lc $last_string_note) == 'e') {
+    $last_string_note_number = 5;
+  }
 }
+print "The first string note is $first_string_note_number\n";
+print "The last sting note is $last_string_note_number\n";
 
 # Supports 3+ strings
 # 1 string: Correctness uncertain
