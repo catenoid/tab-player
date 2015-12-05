@@ -30,12 +30,10 @@ my $last_string_note;
 FILTER: {
   for my $i (0 .. $#selection) {
     if ($selection[$i] =~ /^(E|A|D|G|B)/i) {
-      print "found first string ($1) is on line $i: $selection[$i]\n";
       $first_string_index = $i;
       $first_string_note = $1;
       for my $j ($i .. $#selection) {
         if ($selection[$j] =~ /^(E|A|D|G|B)/i) {
-          print "found last (?) string ($1) is on line $j\n";
           $last_string_index = $j;
           $last_string_note = $1;
         }
@@ -65,7 +63,6 @@ if (($first_string_note_number != $last_string_note_number) and ($last_string_no
 
 my $incomplete_row_above = ($first_string_index != 0 and ($selection[$first_string_index-1] =~ /^(-|\d)+/)); 
 if ($incomplete_row_above) {
-  print "Incomplete row above to add to the truncated tab\n";
   $first_string_index--;
 
   # E string aliasing; Exception 2
@@ -73,8 +70,6 @@ if ($incomplete_row_above) {
     $last_string_note_number = 5;
   }
 }
-print "The first string note is $first_string_note_number\n";
-print "The last sting note is $last_string_note_number\n";
 
 # Supports 3+ strings
 # 1 string: Correctness uncertain
@@ -82,27 +77,11 @@ print "The last sting note is $last_string_note_number\n";
 my @strings = @selection[$first_string_index .. $last_string_index];
 
 my $first_partial = length($strings[0]);
-print "First partial length is $first_partial\n";
-
 my $full = length($strings[1]);
-print "Full length is $full\n";
-
 my $last_partial = length($strings[$#strings]);
-print "Last partial length is $last_partial\n";
-
 my $offset = $full - $first_partial;
-print "Offset: $offset\n";
-
 my $truncated_length = $last_partial - $offset;
 # Check begin cursor comes before end cursor; that $truncated_length is positive
-print "Truncated length: $truncated_length";
-
-sub say {print @_, "\n"}
-
-say "\nUntruncated strings:";
-for my $string (@strings) {
-  say $string;
-}
 
 $strings[0] = (substr $strings[0], 0, $truncated_length);
 for my $i (1 .. ($#strings-1)) {
