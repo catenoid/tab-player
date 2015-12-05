@@ -1,16 +1,6 @@
 use warnings;
 use strict;
 
-# Read in tabs
-my $infile = 'tab-after-truncating.txt';
-open(my $tab_fh, '<:encoding(UTF-8)', $infile)
-  or die "Could not open file '$infile' $!";
-
-# Store ordered notes for MIDI event conversion
-my $outfile = 'notes.csv';
-open(my $notes_fh, '>', $outfile)
-  or die "Could not open file '$outfile' $!";
- 
 # Parse the tab
 # Each stanza is composed of 6 rows representing the guitar strings
 my $guitar_string_count = 6;
@@ -27,7 +17,7 @@ sub ordered_note {
   $a->[2] <=> $b->[2];
 }
 
-while (my $row = <$tab_fh>) {
+while (my $row = <>) {
   my $beat;
   my $beat_mantissa = 0;
   while ($row =~ /((?<fret>1[0-5]|[0-9])|-+|.)/g) {
@@ -51,9 +41,9 @@ while (my $row = <$tab_fh>) {
 
 # Store in CSV
 for my $i ( 0 .. $#sorted_notes ) {
-  print $notes_fh "$sorted_notes[$i][0]";
+  print "$sorted_notes[$i][0]";
   for my $j (1 .. $#{ $sorted_notes[$i] }) {
-    print $notes_fh ",$sorted_notes[$i][$j]";
+    print ",$sorted_notes[$i][$j]";
   }
-  print $notes_fh "\n";
+  print "\n";
 }

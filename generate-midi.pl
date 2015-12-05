@@ -5,11 +5,6 @@ use MIDI;
 # MIDI numbers corresponding to the fundamental frequencies of a 6 string guitar standard tuning
 my @string2MIDInumber = (64,59,55,50,45,40);
 
-# Read in notes
-my $infile = 'notes.csv';
-open(my $notes_fh, '<:encoding(UTF-8)', $infile)
-  or die "Could not open file '$infile' $!";
-
 my @events = (
   ['text_event', 0, 'Your hand in mine'],
   ['text_event', 0, 'by Explosions in the Sky'],
@@ -20,7 +15,7 @@ my @events = (
 my $previous_beat = -1;
 my @chord = (); # For collecting notes that are played simultaneously
 
-while (my $row = <$notes_fh>) {
+while (my $row = <>) {
   chomp($row);
   my ($string, $fret, $beat) = split(',', $row);
   my $note = ($string2MIDInumber[$string] + $fret);

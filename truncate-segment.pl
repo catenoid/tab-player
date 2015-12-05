@@ -6,18 +6,8 @@ use strict;
 # The horizontal positions of their highlighted selection's ends indicates the beat boundaries of that tab, i.e. a shorter segment of the entire tab.
 # The remainder of the tab must be truncated for appropriate fit into extract-notes.pl
 
-# Read in tab segment
-my $infile = 'tab-segment.txt';
-open(my $tab_fh, '<:encoding(UTF-8)', $infile)
-  or die "Could not open file '$infile' $!";
-
-# Store truncated tab for note extraction
-my $outfile = 'tab-after-truncating.txt';
-open(my $tr_tab_fh, '>', $outfile)
-  or die "Could not open file '$outfile' $!";
-
 my @selection = ();
-while (my $row = <$tab_fh>) {
+while (my $row = <>) {
   chomp($row);
   push @selection, $row;
 }
@@ -100,5 +90,5 @@ while ($last_string_note_number < 5) {
 }
 
 for my $string (@strings) {
-  print $tr_tab_fh "$string\n";
+  print "$string\n";
 }
