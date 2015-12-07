@@ -11,7 +11,6 @@ use POSIX qw/ WNOHANG /;
 use constant HOSTNAME => qx{hostname};
 
 my %O = (
-   # 'listen-host' => '127.0.0.1',
     'listen-port' => 8000,
     'listen-clients' => 30,
     'listen-max-req-per-child' => 100,
@@ -67,9 +66,6 @@ sub http_child {
     my $d = shift;
 
     my $i;
-    my $css = <<CSS;
-        form { display: inline; }
-CSS
 
     while (++$i < $O{'listen-max-req-per-child'}) {
         my $c = $d->accept or last;
@@ -81,25 +77,7 @@ CSS
         my %FORM = $r->uri->query_form();
 
         if ($r->uri->path eq '/') {
-            _http_response($c, { content_type => 'text/html' },
-                start_html(
-                    -title => HOSTNAME,
-                    -encoding => 'utf-8',
-                    -style => { -code => $css },
-                ),
-                p('Here are all input parameters:'),
-                pre(Data::Dumper->Dump([\%FORM],['FORM'])),
-                (map { p(a({ href => $_->[0] }, $_->[1])) }
-                    ['/', 'Home'],
-                    ['/ping', 'Ping the simple text/plain content'],
-                    ['/error', 'Sample error page'],
-                    ['/other', 'Sample not found page'],
-                ),
-                end_html(),
-            )
-        }
-        elsif ($r->uri->path eq '/ping') {
-            _http_response($c, { content_type => 'text/plain' }, 'plain text');
+            _http_response($c, { content_type => 'text/plain' }, Data::Dumper->Dump([\%FORM],['FORM']));
         }
         elsif ($r->uri->path eq '/error') {
             my $error = 'AAAAAAAAA! My server error!';
