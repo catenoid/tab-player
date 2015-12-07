@@ -77,7 +77,9 @@ sub http_child {
         my %FORM = $r->uri->query_form();
 
         if ($r->uri->path eq '/') {
-            _http_response($c, { content_type => 'text/plain' }, Data::Dumper->Dump([\%FORM],['FORM']));
+            my $tab = $FORM{'tab'};
+            my $note_list = `echo \"$tab\" | perl truncate-segment.pl | perl extract-notes.pl`; 
+            _http_response($c, { content_type => 'text/plain' }, $note_list);
         }
         elsif ($r->uri->path eq '/error') {
             my $error = 'AAAAAAAAA! My server error!';
