@@ -1,4 +1,4 @@
-console.debug("I loaded");
+console.debug("cursor_selection.js loaded");
 
 $( document ).mouseup(function() {
 		console.debug("Mouse up Event");
