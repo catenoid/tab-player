@@ -80,8 +80,11 @@ sub http_child {
             if(exists($FORM{'tab'})) {
                my $tab = $FORM{'tab'};
                $tab =~ s/\\/\\\\/g;
-               my $note_list = `echo \'$tab\' | perl truncate-segment.pl | perl extract-notes.pl`; 
-               _http_response($c, { content_type => 'text/plain' }, $note_list);
+               `echo \'$tab\' | perl truncate-segment.pl | perl extract-notes.pl | perl generate-midi.pl`; 
+               `timidity -Ow output.mid`;
+               `lame output.wav output.mp3`;
+               $c->send_file( "output.mp3" );
+               #_http_response($c, { content_type => 'text/plain' }, $note_list);
              }
         }
         elsif ($r->uri->path eq '/error') {

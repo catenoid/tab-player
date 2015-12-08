@@ -45,4 +45,4 @@ while (my $row = <>) {
 my $result_track = MIDI::Track->new({ 'events' => \@events });
 my $opus = MIDI::Opus->new(
   { 'format' => 0, 'ticks' => 96, 'tracks' => [ $result_track ] } );
-$opus->write_to_file( 'your_hand_in_mine.mid' );
+$opus->write_to_file( 'output.mid' );
