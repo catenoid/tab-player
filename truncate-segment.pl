@@ -36,6 +36,7 @@ FILTER: {
   }
 }
 
+defined($first_string_index) or die "No strings found\n";
 ($first_string_index != $last_string_index) or die "Not enough strings\n";
 
 my %note2number = (
