@@ -22,7 +22,9 @@ function loadXHR(tab) {
   try {
     source = audioCtx.createBufferSource();
     var xhr = new XMLHttpRequest();
-	var url_params = url + "?tab=" + tab;
+	var url_params = url + "?tab=" + encodeURIComponent(tab);
+	console.debug("Url with parameters:");
+	console.debug(url_params);
     xhr.open("GET", url_params);
     xhr.responseType = "arraybuffer";
     xhr.onerror = function() {console.debug("Network error.")};
