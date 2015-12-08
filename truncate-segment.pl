@@ -26,6 +26,9 @@ FILTER: {
         if ($selection[$j] =~ /^(E|A|D|G|B)/i) {
           $last_string_index = $j;
           $last_string_note = $1;
+          if ($1 eq 'E') {
+            last FILTER;
+          }
         }
       }
       last FILTER;
@@ -33,7 +36,7 @@ FILTER: {
   }
 }
 
-($first_string_index != $last_string_index) or die "Not enough context to align\n";
+($first_string_index != $last_string_index) or die "Not enough strings\n";
 
 my %note2number = (
   "b" => 1,
@@ -50,6 +53,8 @@ my $last_string_note_number = $note2number{$last_string_note};
 
 # E string aliasing
 if ($first_string_note_number == $last_string_note_number) {
+  $first_string_note_number = 0;
+} elsif ($first_string_note eq 'e') {
   $first_string_note_number = 0;
 }
 
@@ -68,7 +73,8 @@ my $full = length($strings[1]);
 my $last_partial = length($strings[$#strings]);
 my $offset = $full - $first_partial;
 my $truncated_length = $last_partial - $offset;
-# Check begin cursor comes before end cursor; that $truncated_length is positive
+
+($truncated_length > 0) or die "Improper selection\n";
 
 $strings[0] = (substr $strings[0], 0, $truncated_length);
 for my $i (1 .. ($#strings-1)) {
