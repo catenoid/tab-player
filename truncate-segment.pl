@@ -33,12 +33,14 @@ FILTER: {
   }
 }
 
+($first_string_index != $last_string_index) or die "Not enough context to align\n";
+
 my %note2number = (
-  "e" => 0, 
   "b" => 1,
   "g" => 2,
   "d" => 3,
   "a" => 4,
+  "e" => 5, 
 );
 
 $first_string_note = lc $first_string_note;
@@ -46,19 +48,14 @@ $last_string_note = lc $last_string_note;
 my $first_string_note_number = $note2number{$first_string_note};
 my $last_string_note_number = $note2number{$last_string_note};
 
-# E string aliasing; Exception 1
-if (($first_string_note_number != $last_string_note_number) and ($last_string_note eq 'e')) {
-  $last_string_note_number = 5;
+# E string aliasing
+if ($first_string_note_number == $last_string_note_number) {
+  $first_string_note_number = 0;
 }
 
 my $incomplete_row_above = ($first_string_index != 0 and ($selection[$first_string_index-1] =~ /^(-|\d)+/)); 
 if ($incomplete_row_above) {
   $first_string_index--;
-
-  # E string aliasing; Exception 2
-  if ($last_string_note eq 'e') {
-    $last_string_note_number = 5;
-  }
 }
 
 # Supports 3+ strings

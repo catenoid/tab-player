@@ -77,9 +77,13 @@ sub http_child {
         my %FORM = $r->uri->query_form();
 
         if ($r->uri->path eq '/') {
-            my $tab = $FORM{'tab'};
-            my $note_list = `echo \"$tab\" | perl truncate-segment.pl | perl extract-notes.pl`; 
-            _http_response($c, { content_type => 'text/plain' }, $note_list);
+            if(exists($FORM{'tab'})) {
+               my $tab = $FORM{'tab'};
+               my $note_list = `echo \"$tab\" | perl truncate-segment.pl`; 
+               _http_response($c, { content_type => 'text/plain' }, $note_list);
+             } else {
+               _http_response($c, { content_type => 'text/plain' }, "No tab query parameter.");
+             }
         }
         elsif ($r->uri->path eq '/error') {
             my $error = 'AAAAAAAAA! My server error!';
